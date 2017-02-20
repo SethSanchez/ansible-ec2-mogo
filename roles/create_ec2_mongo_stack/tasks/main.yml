@@ -135,3 +135,60 @@
   with_subelements:
     - "{{ mongo_boxes.results }}"
     - tagged_instances
+
+######################
+# MongoDB Servers
+######################
+
+# Create 4 MongoS
+- name: Create mongoS
+  ec2:
+    aws_access_key: "{{ access_key_id }}"
+    aws_secret_key: "{{ secret_access_key }}"
+    instance_type: "{{ deployment.mongodb.instance_type }}"
+    image: "{{ deployment.mongodb.ami_id }}"
+    wait: yes
+    region: "{{ target_region }}"
+    assign_public_ip: yes
+    vpc_subnet_id: "{{ item.1.subnet_id }}"
+    group_id:
+      - "{{ mongo_security.group_id }}"
+    instance_tags:
+      Application: "{{ application }}"
+      Name: "MongoDBServer"
+      Environment: "{{ deployment.environment }}"
+      Deployment-Group: "{{ deployment.group }}"
+      Type: MongoDBServer
+    exact_count:  4
+    count_tag:
+      Type: MongoDBServer
+      Deployment-Group: "{{ deployment.group }}"
+      Environment: "{{ deployment.environment }}"
+    zone: "{{ deployment.mongodb.leader.zone }}" 
+    key_name: "{{ ssh_key_name }}"
+  register: mongo_servers
+
+# Wait for SSH to come up
+- name: Wait for SSH to come up on MongoS
+  wait_for:
+    host: "{{ mongo_servers.tagged_instances.0.public_dns_name }}"
+    port: 22
+    timeout: 320
+    state: started
+    search_regex: OpenSSH
+    delay: 10
+  with_subelements:
+    - "{{ mongo_servers.results }}"
+    - tagged_instances
+
+# Add hosts to the list for processing
+- name:
+  add_host:
+    hostname: "{{ item.1.public_dns_name }}"
+    groups: mongo_servers
+    private_ip: "{{ item.1.private_ip }}"
+    ansible_user: "{{ ec2_ssh_user }}"
+    ansible_ssh_private_key_file: "{{ ssh_key_path }}"
+  with_subelements:
+    - "{{ mongo_servers.results }}"
+    - tagged_instances
