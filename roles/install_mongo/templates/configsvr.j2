@@ -1,0 +1,33 @@
+net:
+  http:
+    RESTInterfaceEnabled: true
+    enabled: true
+  port: '16104'
+processManagement:
+  fork: true
+security:
+  authorization: enabled
+  keyFile: /etc/mongodb/mongo.key
+sharding:
+  clusterRole: configsvr
+  configsvrMode: sccc
+## Note ## When we change over to a replica set config server will use the below settings
+#replication:
+   #replSetName: csReplSet
+storage:
+  dbPath: /data0/config16104
+  directoryPerDB: true
+  engine: mmapv1
+  mmapv1:
+    smallFiles: true
+  wiredTiger:
+    collectionConfig:
+      blockCompressor: snappy
+    engineConfig:
+      cacheSizeGB: 1
+      directoryForIndexes: true
+      journalCompressor: snappy
+    indexConfig:
+      prefixCompression: true
+systemLog:
+  destination: syslog

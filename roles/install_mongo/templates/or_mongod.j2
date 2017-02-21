@@ -1,0 +1,34 @@
+net:
+  http:
+    RESTInterfaceEnabled: true
+    enabled: true
+  port: '50011'
+  bindIp: [127.0.0.1,{{ hostvars[inventory_hostname]['private_ip'] }}]
+processManagement:
+  fork: true
+replication:
+  oplogSizeMB: 2000
+  replSetName: {{ deployment.mongodb.replica_set }}
+security:
+  authorization: enabled
+  keyFile: /etc/mongodb/mongo.key
+sharding:
+  archiveMovedChunks: false
+  clusterRole: shardsvr
+storage:
+  dbPath: /data0/mongo50011
+  directoryPerDB: true
+  engine: wiredTiger
+  indexBuildRetry: false
+  smallFiles: true
+  wiredTiger:
+    collectionConfig:
+      blockCompressor: snappy
+    engineConfig:
+      cacheSizeGB: 2
+      directoryForIndexes: true
+      journalCompressor: snappy
+    indexConfig:
+      prefixCompression: true
+systemLog:
+  destination: syslog
