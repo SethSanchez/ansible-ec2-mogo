@@ -7,7 +7,7 @@
     state: present
     cidr_block: "{{ deployment.vpc_cidr }}"
     resource_tags:
-      Name: "MongoDBVpc_{{ deployment.environment }}"
+      Name: "MongoDBVPC_{{ deployment.environment }}"
       Application: "{{ application }}"
     internet_gateway: True
   register: mongo_vpc

@@ -141,7 +141,7 @@
 ######################
 
 # Create 4 MongoS
-- name: Create mongoS
+- name: Create mongo servers
   ec2:
     aws_access_key: "{{ access_key_id }}"
     aws_secret_key: "{{ secret_access_key }}"
@@ -169,7 +169,7 @@
   register: mongo_servers
 
 # Wait for SSH to come up
-- name: Wait for SSH to come up on MongoS
+- name: Wait for SSH to come up on mongo servers
   wait_for:
     host: "{{ mongo_servers.tagged_instances.0.public_dns_name }}"
     port: 22
