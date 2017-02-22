@@ -150,7 +150,7 @@
     wait: yes
     region: "{{ target_region }}"
     assign_public_ip: yes
-    vpc_subnet_id: "{{ item.1.subnet_id }}"
+    vpc_subnet_id: "{{ mongo_servers_subnet.subnet.id }}"
     group_id:
       - "{{ mongo_security.group_id }}"
     instance_tags:
@@ -159,12 +159,12 @@
       Environment: "{{ deployment.environment }}"
       Deployment-Group: "{{ deployment.group }}"
       Type: MongoDBServer
-    exact_count:  4
+    exact_count: 4
     count_tag:
       Type: MongoDBServer
       Deployment-Group: "{{ deployment.group }}"
       Environment: "{{ deployment.environment }}"
-    zone: "{{ deployment.mongodb.leader.zone }}"
+    zone: "{{ deployment.mongodb.mongos.zone }}"
     key_name: "{{ ssh_key_name }}"
   register: mongo_servers
 
@@ -207,7 +207,7 @@
     wait: yes
     region: "{{ target_region }}"
     assign_public_ip: yes
-    vpc_subnet_id: "{{ item.1.subnet_id }}"
+    vpc_subnet_id: "{{ mongo_configs_subnet.subnet.id }}"
     group_id:
       - "{{ mongo_security.group_id }}"
     instance_tags:
@@ -216,12 +216,12 @@
       Environment: "{{ deployment.environment }}"
       Deployment-Group: "{{ deployment.group }}"
       Type: MongoDBConfig
-    exact_count:  3
+    exact_count: 3
     count_tag:
       Type: MongoDBConfig
       Deployment-Group: "{{ deployment.group }}"
       Environment: "{{ deployment.environment }}"
-    zone: "{{ deployment.mongodb.leader.zone }}"
+    zone: "{{ deployment.mongodb.configs.zone }}"
     key_name: "{{ ssh_key_name }}"
   register: mongo_configs
 
