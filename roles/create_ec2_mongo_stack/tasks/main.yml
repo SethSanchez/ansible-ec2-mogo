@@ -94,13 +94,13 @@
       - "{{ mongo_security.group_id }}"
     instance_tags:
       Application: "{{ application }}"
-      Name: "MongoDBTier"
+      Name: "MongoDNode"
       Environment: "{{ deployment.environment }}"
       Deployment-Group: "{{ deployment.group }}"
-      Type: MongoDBMinion
+      Type: MongoDNode
     exact_count: "{{ item.0.ensure_count }}"
     count_tag:
-      Type: MongoDBMinion
+      Type: MongoDNode
       Deployment-Group: "{{ deployment.group }}"
       Environment: "{{ deployment.environment }}"
     zone: "{{ item.0.zone }}"
