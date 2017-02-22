@@ -177,21 +177,21 @@
     state: started
     search_regex: OpenSSH
     delay: 10
-  with_subelements:
-    - "{{ mongo_servers.results }}"
-    - tagged_instances
+  # with_subelements:
+    # - "{{ mongo_servers.tagged_instances }}"
+    # - tagged_instances
 
 # Add hosts to the list for processing
 - name:
   add_host:
-    hostname: "{{ item.1.public_dns_name }}"
+    hostname: "{{ mongo_servers.tagged_instances.0.public_dns_name }}"
     groups: mongo_servers
-    private_ip: "{{ item.1.private_ip }}"
+    private_ip: "{{ mongo_servers.tagged_instances.0.private_ip }}"
     ansible_user: "{{ ec2_ssh_user }}"
     ansible_ssh_private_key_file: "{{ ssh_key_path }}"
-  with_subelements:
-    - "{{ mongo_servers.results }}"
-    - tagged_instances
+  # with_subelements:
+    # - "{{ mongo_servers.tagged_instances }}"
+    # - tagged_instances
 
 ###########################
 # MongoDB Config Servers
@@ -234,18 +234,18 @@
     state: started
     search_regex: OpenSSH
     delay: 10
-  with_subelements:
-    - "{{ mongo_configs.results }}"
-    - tagged_instances
+  # with_subelements:
+  #   - "{{ mongo_configs.results }}"
+  #   - tagged_instances
 
 # Add hosts to the list for processing
 - name:
   add_host:
-    hostname: "{{ item.1.public_dns_name }}"
+    hostname: "{{ mongo_configs.tagged_instances.0.public_dns_name }}"
     groups: mongo_configs
-    private_ip: "{{ item.1.private_ip }}"
+    private_ip: "{{ mongo_configs.tagged_instances.0.private_ip }}"
     ansible_user: "{{ ec2_ssh_user }}"
     ansible_ssh_private_key_file: "{{ ssh_key_path }}"
-  with_subelements:
-    - "{{ mongo_configs.results }}"
-    - tagged_instances
+  # with_subelements:
+  #   - "{{ mongo_configs.results }}"
+  #   - tagged_instances

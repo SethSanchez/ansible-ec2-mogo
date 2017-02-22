@@ -12,6 +12,13 @@
     internet_gateway: True
   register: mongo_vpc
 
+# since ec2_vpc is deprecated, need the below when switching to ec2_vpc_net
+# - name: Setup internet gateway
+#   ec2_vpc_igw:
+#     vpc_id: "{{ mongo_vpc.vpc_id }}"
+#     state: present
+#   register: igw
+
 - name: Create a subnet for the leader node
   ec2_vpc_subnet:
     aws_access_key: "{{ access_key_id }}"
@@ -25,7 +32,7 @@
       Application: "{{ application }}"
   register: mongo_leader_subnet
 
-- name: Per AWS, create a subnet per AZ
+- name: Subnet per AZ, MongoD
   ec2_vpc_subnet:
     aws_access_key: "{{ access_key_id }}"
     aws_secret_key: "{{ secret_access_key }}"
@@ -51,9 +58,6 @@
       Name: "MongoS_Subnet"
       Application: "{{ application }}"
   register: mongo_servers_subnet
-
-- debug:
-    var: mongo_servers_subnet
 
 - name: Subnets for Configs
   ec2_vpc_subnet:
