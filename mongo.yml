@@ -29,3 +29,21 @@
     - "regions/mongodb_{{ aws_region }}_{{ deployment_group }}.yml"
   roles:
     - init_mongo_replication
+
+- hosts: mongo_configs
+  gather_facts: False
+  vars_files:
+    - vars/config.yml
+    - vars/credentials.yml
+    - "regions/mongodb_{{ aws_region }}_{{ deployment_group }}.yml"
+  roles:
+    - init_config_servers
+
+- hosts: mongo_servers
+  gather_facts: False
+  vars_files:
+    - vars/config.yml
+    - vars/credentials.yml
+    - "regions/mongodb_{{ aws_region }}_{{ deployment_group }}.yml"
+  roles:
+    - init_mongos_servers

@@ -13,8 +13,8 @@
 - name: Copy the configuration file template to the remote host
   template:
     force: yes
-    src: or_mongod.j2
-    dest: /etc/mongod.conf
+    src: mongos.j2
+    dest: /etc/mongos.conf
 
 - name: Start the mongo daemon
   service: name=mongod state=restarted
