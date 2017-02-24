@@ -6,17 +6,18 @@ net:
   bindIp: [127.0.0.1,{{ hostvars[inventory_hostname]['private_ip'] }}]
 processManagement:
   fork: true
+  pidFilePath: /var/run/mongodb/mongod.pid
 replication:
   oplogSizeMB: 2000
   replSetName: {{ deployment.mongodb.replica_set }}
-security:
-  authorization: enabled
-  keyFile: /etc/mongodb/mongo.key
+#security:
+#  authorization: enabled
+#  keyFile: /etc/mongodb/mongo.key
 sharding:
   archiveMovedChunks: false
   clusterRole: shardsvr
 storage:
-  dbPath: /data0/mongo50011
+  dbPath: /data
   directoryPerDB: true
   engine: wiredTiger
   indexBuildRetry: false

@@ -94,13 +94,13 @@
       - "{{ mongo_security.group_id }}"
     instance_tags:
       Application: "{{ application }}"
-      Name: "MongoDNode"
+      Name: "MongoD"
       Environment: "{{ deployment.environment }}"
       Deployment-Group: "{{ deployment.group }}"
-      Type: MongoDNode
+      Type: MongoD
     exact_count: "{{ item.0.ensure_count }}"
     count_tag:
-      Type: MongoDNode
+      Type: MongoD
       Deployment-Group: "{{ deployment.group }}"
       Environment: "{{ deployment.environment }}"
     zone: "{{ item.0.zone }}"
@@ -145,7 +145,7 @@
   ec2:
     aws_access_key: "{{ access_key_id }}"
     aws_secret_key: "{{ secret_access_key }}"
-    instance_type: "{{ deployment.mongodb.instance_type }}"
+    instance_type: "{{ deployment.mongodb.mongos_type }}"
     image: "{{ deployment.mongodb.ami_id }}"
     wait: yes
     region: "{{ target_region }}"
@@ -155,43 +155,50 @@
       - "{{ mongo_security.group_id }}"
     instance_tags:
       Application: "{{ application }}"
-      Name: "MongoDBServer"
+      Name: "MongoS"
       Environment: "{{ deployment.environment }}"
       Deployment-Group: "{{ deployment.group }}"
-      Type: MongoDBServer
+      Type: MongoS
     exact_count: 4
     count_tag:
-      Type: MongoDBServer
+      Type: MongoS
       Deployment-Group: "{{ deployment.group }}"
       Environment: "{{ deployment.environment }}"
     zone: "{{ deployment.mongodb.mongos.zone }}"
     key_name: "{{ ssh_key_name }}"
   register: mongo_servers
+  with_nested:
+    - "{{ deployment.mongodb.azs }}"
+    - "{{ mongo_subnets_to_azs }}"
+  when: item.0.zone == item.1.zone
+
+- debug:
+    var: mongo_servers
 
 # Wait for SSH to come up
 - name: Wait for SSH to come up on mongo servers
   wait_for:
-    host: "{{ mongo_servers.tagged_instances.0.public_dns_name }}"
+    host: "{{ item.1.public_dns_name }}"
     port: 22
     timeout: 320
     state: started
     search_regex: OpenSSH
     delay: 10
-  # with_subelements:
-    # - "{{ mongo_servers.tagged_instances }}"
-    # - tagged_instances
+  with_subelements:
+    - "{{ mongo_servers.results }}"
+    - tagged_instances
 
 # Add hosts to the list for processing
 - name:
   add_host:
-    hostname: "{{ mongo_servers.tagged_instances.0.public_dns_name }}"
+    hostname: "{{ item.1.public_dns_name }}"
     groups: mongo_servers
-    private_ip: "{{ mongo_servers.tagged_instances.0.private_ip }}"
+    private_ip: "{{ item.1.private_ip }}"
     ansible_user: "{{ ec2_ssh_user }}"
     ansible_ssh_private_key_file: "{{ ssh_key_path }}"
-  # with_subelements:
-    # - "{{ mongo_servers.tagged_instances }}"
-    # - tagged_instances
+  with_subelements:
+    - "{{ mongo_servers.results }}"
+    - tagged_instances
 
 ###########################
 # MongoDB Config Servers
@@ -202,7 +209,7 @@
   ec2:
     aws_access_key: "{{ access_key_id }}"
     aws_secret_key: "{{ secret_access_key }}"
-    instance_type: "{{ deployment.mongodb.instance_type }}"
+    instance_type: "{{ deployment.mongodb.config_type }}"
     image: "{{ deployment.mongodb.ami_id }}"
     wait: yes
     region: "{{ target_region }}"
@@ -212,13 +219,13 @@
       - "{{ mongo_security.group_id }}"
     instance_tags:
       Application: "{{ application }}"
-      Name: "MongoDBConfig"
+      Name: "MongoConfigs"
       Environment: "{{ deployment.environment }}"
       Deployment-Group: "{{ deployment.group }}"
-      Type: MongoDBConfig
+      Type: MongoConfigs
     exact_count: 3
     count_tag:
-      Type: MongoDBConfig
+      Type: MongoConfigs
       Deployment-Group: "{{ deployment.group }}"
       Environment: "{{ deployment.environment }}"
     zone: "{{ deployment.mongodb.configs.zone }}"

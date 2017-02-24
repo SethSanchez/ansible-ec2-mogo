@@ -6,7 +6,9 @@ deployment:
   vpc_cidr: 172.24.0.0/16
   mongodb:
     ami_id: ami-c481fad3
-    instance_type: t2.micro
+    instance_type: m4.xlarge
+    mongos_type: m3.large
+    config_type: t2.medium
     replica_set: "repl-{{ target_region }}"
     leader:
       zone: "us-east-1b"

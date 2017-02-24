@@ -16,5 +16,11 @@
     src: or_mongod.j2
     dest: /etc/mongod.conf
 
+- name: create run directory for mongodb
+  file: path=/var/run/mongo state=directory owner=mongod group=mongod
+
+- name: Create the db file path
+  file: path=/data state=directory owner=mongod group=mongod
+
 - name: Start the mongo daemon
   service: name=mongod state=restarted
